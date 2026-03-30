@@ -40,28 +40,47 @@ jobs:
           }
           BWEOF
 
-      - name: Build with Bubblewrap
+      - name: Init and Build with Bubblewrap
         env:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           mkdir -p twa-project
-          cp twa-manifest.json twa-project/twa-manifest.json
           cp signing.keystore twa-project/signing.keystore
-          cd twa-project
 
           expect << EXPECTEOF
-          set timeout 120
-          spawn bubblewrap build
-          expect "regenerate" { send "n\r" }
-          expect "Key Store:" { send "$env(KEY_PASSWORD)\r" }
+          set timeout 180
+          spawn bubblewrap init --manifest=https://dvsoft.kr/mobile/manifest.json --directory=twa-project
+          expect "Package ID" { send "kr.dvsoft.churchcms\r" }
+          expect "display name" { send "디바인교회관리\r" }
+          expect "launcher name" { send "교회관리\r" }
+          expect "theme color" { send "#2c3e52\r" }
+          expect "background color" { send "#2c3e52\r" }
+          expect "start URL" { send "/mobile/\r" }
+          expect "icon URL" { send "https://dvsoft.kr/mobile/icon-512.png\r" }
+          expect "maskable" { send "https://dvsoft.kr/mobile/icon-512.png\r" }
+          expect "monochrome" { send "\r" }
+          expect "application version" { send "2\r" }
+          expect "version code" { send "2\r" }
+          expect "signing key" { send "twa-project/signing.keystore\r" }
+          expect "alias" { send "dvsoft\r" }
+          expect "Key Store" { send "$env(KEY_PASSWORD)\r" }
           expect "Key:" { send "$env(KEY_PASSWORD)\r" }
+          expect "install" { send "n\r" }
           expect eof
           EXPECTEOF
 
+          cd twa-project
+          expect << EXPECTEOF2
+          set timeout 180
+          spawn bubblewrap build
+          expect "regenerate" { send "n\r" }
+          expect "Key Store" { send "$env(KEY_PASSWORD)\r" }
+          expect "Key:" { send "$env(KEY_PASSWORD)\r" }
+          expect eof
+          EXPECTEOF2
+
       - name: Find output files
-        run: |
-          echo "=== twa-project 폴더 내용 ==="
-          find twa-project -type f | head -30
+        run: find twa-project -name "*.aab" -o -name "*.apk" | head -20
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
@@ -70,3 +89,4 @@ jobs:
           path: |
             twa-project/**/*.aab
             twa-project/**/*.apk
+          if-no-files-found: warn
