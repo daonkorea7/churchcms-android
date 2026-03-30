@@ -9,10 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
 
@@ -20,19 +20,20 @@ jobs:
         run: npm install -g @bubblewrap/cli
 
       - name: Setup Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
+        uses: android-actions/setup-android@v3
 
       - name: Initialize Bubblewrap project
         run: |
           mkdir -p twa-project
           cd twa-project
-          bubblewrap init --manifest=https://dvsoft.kr/mobile/manifest.json \
+          bubblewrap init \
+            --manifest=https://dvsoft.kr/mobile/manifest.json \
             --directory=. \
             --packageId=kr.dvsoft.churchcms \
             --host=dvsoft.kr \
@@ -54,7 +55,7 @@ jobs:
           bubblewrap build
 
       - name: Upload AAB
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: app-release-bundle
           path: twa-project/app-release-bundle.aab
