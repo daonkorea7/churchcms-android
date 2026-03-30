@@ -1,0 +1,42 @@
+{
+  "packageId": "kr.dvsoft.churchcms",
+  "host": "dvsoft.kr",
+  "name": "디바인교회관리",
+  "launcherName": "교회관리",
+  "display": "standalone",
+  "themeColor": "#2c3e52",
+  "navigationColor": "#2c3e52",
+  "navigationColorDark": "#2c3e52",
+  "navigationDividerColor": "#2c3e52",
+  "navigationDividerColorDark": "#2c3e52",
+  "backgroundColor": "#2c3e52",
+  "enableNotifications": false,
+  "startUrl": "/mobile/",
+  "iconUrl": "https://dvsoft.kr/mobile/icon-512.png",
+  "maskableIconUrl": "https://dvsoft.kr/mobile/icon-512.png",
+  "monochromeIconUrl": null,
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "signing.keystore",
+    "alias": "dvsoft"
+  },
+  "appVersionCode": 2,
+  "appVersion": "2.0.0",
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://dvsoft.kr/mobile/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {"enabled": false},
+    "playBilling": {"enabled": false}
+  },
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "orientation": "portrait",
+  "fingerprints": [
+    {
+      "name": "SHA256",
+      "value": "3B:A5:DE:45:31:83:6D:04:A6:53:28:BF:6A:36:A7:6A:87:6D:C0:73:F1:48:CD:7D:3B:38:4C:36:29:DC:57:4B"
+    }
+  ]
+}
