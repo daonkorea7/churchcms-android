@@ -28,8 +28,15 @@ jobs:
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
-      - name: Find JDK Path
-        run: echo "JAVA_HOME=$JAVA_HOME"
+      - name: Create Bubblewrap config
+        run: |
+          mkdir -p ~/.bubblewrap
+          cat > ~/.bubblewrap/config.json << 'BWEOF'
+          {
+            "jdkPath": "/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.18-8/x64",
+            "androidSdkPath": "/usr/local/lib/android/sdk"
+          }
+          BWEOF
 
       - name: Build with Bubblewrap
         env:
@@ -39,7 +46,7 @@ jobs:
           cp twa-manifest.json twa-project/twa-manifest.json
           cp signing.keystore twa-project/signing.keystore
           cd twa-project
-          printf "n\n/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.18-8/x64\n" | bubblewrap build \
+          bubblewrap build \
             --signingKeyPassword=$KEY_PASSWORD \
             --signingKeyStorePassword=$KEY_PASSWORD
 
