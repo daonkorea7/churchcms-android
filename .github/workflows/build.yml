@@ -58,8 +58,15 @@ jobs:
           expect eof
           EXPECTEOF
 
+      - name: Find output files
+        run: |
+          echo "=== twa-project 폴더 내용 ==="
+          find twa-project -type f | head -30
+
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
           name: app-release-bundle
-          path: twa-project/app-release-bundle.aab
+          path: |
+            twa-project/**/*.aab
+            twa-project/**/*.apk
