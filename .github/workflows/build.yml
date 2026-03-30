@@ -31,12 +31,13 @@ jobs:
       - name: Build with Bubblewrap
         env:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          JAVA_HOME: ${{ env.JAVA_HOME }}
         run: |
           mkdir -p twa-project
           cp twa-manifest.json twa-project/twa-manifest.json
           cp signing.keystore twa-project/signing.keystore
           cd twa-project
-          echo "n" | bubblewrap build \
+          printf "n\n${JAVA_HOME}\n" | bubblewrap build \
             --signingKeyPassword=$KEY_PASSWORD \
             --signingKeyStorePassword=$KEY_PASSWORD
 
