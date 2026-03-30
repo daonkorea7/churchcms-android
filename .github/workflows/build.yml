@@ -46,9 +46,7 @@ jobs:
           cp twa-manifest.json twa-project/twa-manifest.json
           cp signing.keystore twa-project/signing.keystore
           cd twa-project
-          printf "n\n" | bubblewrap build \
-            --signingKeyPassword=$KEY_PASSWORD \
-            --signingKeyStorePassword=$KEY_PASSWORD
+          printf "n\n$KEY_PASSWORD\n$KEY_PASSWORD\n" | bubblewrap build
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
