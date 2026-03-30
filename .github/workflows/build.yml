@@ -46,7 +46,7 @@ jobs:
           cp twa-manifest.json twa-project/twa-manifest.json
           cp signing.keystore twa-project/signing.keystore
           cd twa-project
-          bubblewrap build \
+          printf "n\n" | bubblewrap build \
             --signingKeyPassword=$KEY_PASSWORD \
             --signingKeyStorePassword=$KEY_PASSWORD
 
