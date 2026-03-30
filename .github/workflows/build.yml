@@ -1,0 +1,60 @@
+name: Build Android AAB
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Bubblewrap
+        run: npm install -g @bubblewrap/cli
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+
+      - name: Initialize Bubblewrap project
+        run: |
+          mkdir -p twa-project
+          cd twa-project
+          bubblewrap init --manifest=https://dvsoft.kr/mobile/manifest.json \
+            --directory=. \
+            --packageId=kr.dvsoft.churchcms \
+            --host=dvsoft.kr \
+            --startUrl=/mobile/ \
+            --name="디바인교회관리" \
+            --shortName="교회관리" \
+            --themeColor=#2c3e52 \
+            --backgroundColor=#2c3e52 \
+            --iconUrl=https://dvsoft.kr/mobile/icon-512.png \
+            --maskableIconUrl=https://dvsoft.kr/mobile/icon-512.png \
+            --signingKeyPath=../signing.keystore \
+            --signingKeyAlias=dvsoft \
+            --signingKeyPassword=${{ secrets.KEY_PASSWORD }} \
+            --signingKeyStorePassword=${{ secrets.KEY_PASSWORD }}
+
+      - name: Build AAB
+        run: |
+          cd twa-project
+          bubblewrap build
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release-bundle
+          path: twa-project/app-release-bundle.aab
