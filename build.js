@@ -2,10 +2,14 @@ const path = require('path');
 const fs = require('fs');
 
 async function main() {
-  const bubblewrap = require('@bubblewrap/core');
-  console.log('Available exports:', Object.keys(bubblewrap));
-
-  const { TwaManifest, TwaGenerator, Config } = bubblewrap;
+  const {
+    TwaManifest,
+    TwaGenerator,
+    Config,
+    GradleWrapper,
+    JarSigner,
+    KeyTool
+  } = require('@bubblewrap/core');
 
   const targetDir = path.resolve('./twa-project');
   fs.mkdirSync(targetDir, { recursive: true });
@@ -50,21 +54,38 @@ async function main() {
     process.env.ANDROID_SDK_ROOT
   );
 
+  // 프로젝트 생성
   const generator = new TwaGenerator();
   console.log('프로젝트 생성 중...');
   await generator.createTwaProject(targetDir, twaManifest, config);
   console.log('프로젝트 생성 완료!');
 
+  // Gradle로 빌드
   const keyPassword = process.env.KEY_PASSWORD;
-  console.log('빌드 중...');
-  await generator.buildTwaProject(targetDir, {
-    signingKeyPath: path.resolve(targetDir, 'signing.keystore'),
-    signingKeyAlias: 'dvsoft',
-    signingKeyPassword: keyPassword,
-    signingKeyStorePassword: keyPassword,
-  }, config);
+  const gradleWrapper = new GradleWrapper(targetDir, config);
+  console.log('Gradle 빌드 중...');
+  await gradleWrapper.bundleRelease();
+  console.log('Gradle 빌드 완료!');
 
-  console.log('빌드 완료!');
+  // 서명
+  const jarSigner = new JarSigner(config);
+  const unsignedAab = path.resolve(
+    targetDir,
+    'app/build/outputs/bundle/release/app-release.aab'
+  );
+  const signedAab = path.resolve(targetDir, 'app-release-signed.aab');
+
+  console.log('서명 중...');
+  await jarSigner.sign(
+    path.resolve(targetDir, 'signing.keystore'),
+    'dvsoft',
+    keyPassword,
+    keyPassword,
+    unsignedAab,
+    signedAab
+  );
+  console.log('서명 완료!');
+  console.log('AAB 파일:', signedAab);
 }
 
 main().catch(err => {
