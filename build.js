@@ -33,6 +33,7 @@ async function main() {
     startUrl: '/mobile/',
     iconUrl: 'https://dvsoft.kr/mobile/icon-512.png',
     maskableIconUrl: 'https://dvsoft.kr/mobile/icon-512.png',
+    splashScreenFadeOutDuration: 300,
     appVersionCode: 2,
     appVersion: '2.0.0',
     signingKey: {
@@ -59,6 +60,16 @@ async function main() {
   console.log('1. 프로젝트 생성 중...');
   await generator.createTwaProject(targetDir, twaManifest, config);
   console.log('2. 프로젝트 생성 완료!');
+
+  // build.gradle의 splashScreenFadeOutDuration 값 확인 및 수정
+  const buildGradlePath = path.resolve(targetDir, 'app/build.gradle');
+  let buildGradle = fs.readFileSync(buildGradlePath, 'utf8');
+  buildGradle = buildGradle.replace(
+    /splashScreenFadeOutDuration:\s*,/g,
+    'splashScreenFadeOutDuration: 300,'
+  );
+  fs.writeFileSync(buildGradlePath, buildGradle);
+  console.log('2-1. build.gradle 수정 완료!');
 
   const jdkHelper = new JdkHelper(process, config);
   console.log('3. JdkHelper 초기화 완료!');
