@@ -8,7 +8,6 @@ async function main() {
     Config,
     GradleWrapper,
     JarSigner,
-    KeyTool
   } = require('@bubblewrap/core');
 
   const targetDir = path.resolve('./twa-project');
@@ -60,9 +59,9 @@ async function main() {
   await generator.createTwaProject(targetDir, twaManifest, config);
   console.log('프로젝트 생성 완료!');
 
-  // Gradle로 빌드
+  // GradleWrapper - process 객체 직접 전달
   const keyPassword = process.env.KEY_PASSWORD;
-  const gradleWrapper = new GradleWrapper(targetDir, config);
+  const gradleWrapper = new GradleWrapper(process, config, targetDir);
   console.log('Gradle 빌드 중...');
   await gradleWrapper.bundleRelease();
   console.log('Gradle 빌드 완료!');
