@@ -2,9 +2,20 @@ const path = require('path');
 const fs = require('fs');
 
 async function main() {
-  const { TwaManifest, TwaGenerator, Config, KeyTool, SigningKeyInfo } = require('@bubblewrap/core');
+  const bubblewrap = require('@bubblewrap/core');
+  console.log('Available exports:', Object.keys(bubblewrap));
 
-  const manifest = new TwaManifest({
+  const { TwaManifest, TwaGenerator, Config } = bubblewrap;
+
+  const targetDir = path.resolve('./twa-project');
+  fs.mkdirSync(targetDir, { recursive: true });
+
+  fs.copyFileSync(
+    path.resolve('./signing.keystore'),
+    path.resolve(targetDir, 'signing.keystore')
+  );
+
+  const twaManifest = new TwaManifest({
     packageId: 'kr.dvsoft.churchcms',
     host: 'dvsoft.kr',
     name: '디바인교회관리',
@@ -20,7 +31,7 @@ async function main() {
     appVersionCode: 2,
     appVersion: '2.0.0',
     signingKey: {
-      path: path.resolve('./signing.keystore'),
+      path: './signing.keystore',
       alias: 'dvsoft',
     },
     webManifestUrl: 'https://dvsoft.kr/mobile/manifest.json',
@@ -30,6 +41,8 @@ async function main() {
       playBilling: { enabled: false },
     },
     orientation: 'portrait',
+    shortcuts: [],
+    fingerprints: [],
   });
 
   const config = new Config(
@@ -38,17 +51,19 @@ async function main() {
   );
 
   const generator = new TwaGenerator();
-  await generator.createTwaProject('./', manifest);
+  console.log('프로젝트 생성 중...');
+  await generator.createTwaProject(targetDir, twaManifest, config);
+  console.log('프로젝트 생성 완료!');
 
   const keyPassword = process.env.KEY_PASSWORD;
-  const signingInfo = new SigningKeyInfo(
-    path.resolve('./signing.keystore'),
-    'dvsoft',
-    keyPassword,
-    keyPassword
-  );
+  console.log('빌드 중...');
+  await generator.buildTwaProject(targetDir, {
+    signingKeyPath: path.resolve(targetDir, 'signing.keystore'),
+    signingKeyAlias: 'dvsoft',
+    signingKeyPassword: keyPassword,
+    signingKeyStorePassword: keyPassword,
+  }, config);
 
-  await generator.buildTwaProject('./', signingInfo);
   console.log('빌드 완료!');
 }
 
