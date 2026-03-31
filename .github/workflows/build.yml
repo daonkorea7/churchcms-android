@@ -40,44 +40,48 @@ jobs:
           }
           BWEOF
 
-      - name: Init and Build with Bubblewrap
+      - name: Init Bubblewrap
         env:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           mkdir -p twa-project
           cp signing.keystore twa-project/signing.keystore
 
-          expect << EXPECTEOF
+          expect -c "
           set timeout 180
           spawn bubblewrap init --manifest=https://dvsoft.kr/mobile/manifest.json --directory=twa-project
-          expect "Package ID" { send "kr.dvsoft.churchcms\r" }
-          expect "display name" { send "디바인교회관리\r" }
-          expect "launcher name" { send "교회관리\r" }
-          expect "theme color" { send "#2c3e52\r" }
-          expect "background color" { send "#2c3e52\r" }
-          expect "start URL" { send "/mobile/\r" }
-          expect "icon URL" { send "https://dvsoft.kr/mobile/icon-512.png\r" }
-          expect "maskable" { send "https://dvsoft.kr/mobile/icon-512.png\r" }
-          expect "monochrome" { send "\r" }
-          expect "application version" { send "2\r" }
-          expect "version code" { send "2\r" }
-          expect "signing key" { send "twa-project/signing.keystore\r" }
-          expect "alias" { send "dvsoft\r" }
-          expect "Key Store" { send "$env(KEY_PASSWORD)\r" }
-          expect "Key:" { send "$env(KEY_PASSWORD)\r" }
-          expect "install" { send "n\r" }
+          expect \"Domain:\" { send \"\r\" }
+          expect \"URL path:\" { send \"/mobile/\r\" }
+          expect \"name\" { send \"\r\" }
+          expect \"short name\" { send \"\r\" }
+          expect \"theme\" { send \"\r\" }
+          expect \"background\" { send \"\r\" }
+          expect \"Package ID\" { send \"kr.dvsoft.churchcms\r\" }
+          expect \"version code\" { send \"2\r\" }
+          expect \"version name\" { send \"2.0.0\r\" }
+          expect \"signing key\" { send \"twa-project/signing.keystore\r\" }
+          expect \"alias\" { send \"dvsoft\r\" }
+          expect \"Key Store\" { send \"$env(KEY_PASSWORD)\r\" }
+          expect \"Key:\" { send \"$env(KEY_PASSWORD)\r\" }
+          expect \"install\" { send \"n\r\" }
+          expect \"shortcuts\" { send \"\r\" }
+          expect \"display\" { send \"\r\" }
           expect eof
-          EXPECTEOF
+          "
 
+      - name: Build Bubblewrap
+        env:
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
           cd twa-project
-          expect << EXPECTEOF2
+          expect -c "
           set timeout 180
           spawn bubblewrap build
-          expect "regenerate" { send "n\r" }
-          expect "Key Store" { send "$env(KEY_PASSWORD)\r" }
-          expect "Key:" { send "$env(KEY_PASSWORD)\r" }
+          expect \"regenerate\" { send \"n\r\" }
+          expect \"Key Store\" { send \"$env(KEY_PASSWORD)\r\" }
+          expect \"Key:\" { send \"$env(KEY_PASSWORD)\r\" }
           expect eof
-          EXPECTEOF2
+          "
 
       - name: Find output files
         run: find twa-project -name "*.aab" -o -name "*.apk" | head -20
