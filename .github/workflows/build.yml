@@ -26,8 +26,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Install dependencies
-        run: |
-          npm install @bubblewrap/core
+        run: npm install @bubblewrap/core
 
       - name: Create Bubblewrap config
         run: |
@@ -39,11 +38,6 @@ jobs:
           }
           BWEOF
 
-      - name: Setup project
-        run: |
-          cp signing.keystore signing.keystore
-          cp build.js build.js
-
       - name: Build AAB
         env:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
@@ -52,7 +46,7 @@ jobs:
         run: node build.js
 
       - name: Find output files
-        run: find . -name "*.aab" -o -name "*.apk" | head -20
+        run: find . -name "*.aab" -o -name "*.apk" | grep -v node_modules | head -20
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
