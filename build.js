@@ -8,6 +8,7 @@ async function main() {
     Config,
     GradleWrapper,
     JarSigner,
+    AndroidSdkTools,
   } = require('@bubblewrap/core');
 
   const targetDir = path.resolve('./twa-project');
@@ -59,9 +60,13 @@ async function main() {
   await generator.createTwaProject(targetDir, twaManifest, config);
   console.log('프로젝트 생성 완료!');
 
-  // GradleWrapper - process 객체 직접 전달
+  // AndroidSdkTools 초기화
+  const androidSdkTools = await AndroidSdkTools.create(process, config);
+  console.log('AndroidSdkTools 초기화 완료!');
+
+  // GradleWrapper
   const keyPassword = process.env.KEY_PASSWORD;
-  const gradleWrapper = new GradleWrapper(process, config, targetDir);
+  const gradleWrapper = new GradleWrapper(process, config, targetDir, androidSdkTools);
   console.log('Gradle 빌드 중...');
   await gradleWrapper.bundleRelease();
   console.log('Gradle 빌드 완료!');
