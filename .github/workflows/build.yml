@@ -51,23 +51,26 @@ jobs:
           set timeout 180
           spawn bubblewrap init --manifest=https://dvsoft.kr/mobile/manifest.json --directory=twa-project
           expect \"Domain:\" { send \"\r\" }
-          expect \"URL path:\" { send \"/mobile/\r\" }
-          expect \"name\" { send \"\r\" }
-          expect \"short name\" { send \"\r\" }
-          expect \"theme\" { send \"\r\" }
-          expect \"background\" { send \"\r\" }
-          expect \"Package ID\" { send \"kr.dvsoft.churchcms\r\" }
-          expect \"version code\" { send \"2\r\" }
-          expect \"version name\" { send \"2.0.0\r\" }
-          expect \"signing key\" { send \"twa-project/signing.keystore\r\" }
-          expect \"alias\" { send \"dvsoft\r\" }
+          expect \"URL path:\" { send \"\r\" }
+          expect -re \"name.*:\" { send \"\r\" }
+          expect -re \"name.*:\" { send \"\r\" }
+          expect -re \"theme.*:\" { send \"\r\" }
+          expect -re \"background.*:\" { send \"\r\" }
+          expect -re \"Package ID.*:\" { send \"kr.dvsoft.churchcms\r\" }
+          expect -re \"version code.*:\" { send \"2\r\" }
+          expect -re \"version name.*:\" { send \"2.0.0\r\" }
+          expect -re \"signing key.*:\" { send \"twa-project/signing.keystore\r\" }
+          expect -re \"alias.*:\" { send \"dvsoft\r\" }
           expect \"Key Store\" { send \"$env(KEY_PASSWORD)\r\" }
           expect \"Key:\" { send \"$env(KEY_PASSWORD)\r\" }
-          expect \"install\" { send \"n\r\" }
-          expect \"shortcuts\" { send \"\r\" }
-          expect \"display\" { send \"\r\" }
+          expect -re \"install.*\" { send \"n\r\" }
           expect eof
           "
+
+      - name: Check Init Result
+        run: |
+          echo "=== twa-project 내용 ==="
+          ls -la twa-project/
 
       - name: Build Bubblewrap
         env:
