@@ -51,7 +51,7 @@ jobs:
           set timeout 180
           spawn bubblewrap init --manifest=https://dvsoft.kr/mobile/manifest.json --directory=twa-project
           expect \"Domain:\" { send \"\r\" }
-          expect \"URL path:\" { send \"\r\" }
+          expect \"URL path:\" { send \"/mobile/\r\" }
           expect -re \"name.*:\" { send \"\r\" }
           expect -re \"name.*:\" { send \"\r\" }
           expect -re \"theme.*:\" { send \"\r\" }
