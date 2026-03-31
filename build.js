@@ -55,36 +55,28 @@ async function main() {
     process.env.ANDROID_SDK_ROOT
   );
 
-  // 프로젝트 생성
   const generator = new TwaGenerator();
-  console.log('프로젝트 생성 중...');
+  console.log('1. 프로젝트 생성 중...');
   await generator.createTwaProject(targetDir, twaManifest, config);
-  console.log('프로젝트 생성 완료!');
+  console.log('2. 프로젝트 생성 완료!');
 
-  // JdkHelper 초기화
   const jdkHelper = new JdkHelper(process, config);
-  console.log('JdkHelper 초기화 완료!');
+  console.log('3. JdkHelper 초기화 완료!');
 
-  // AndroidSdkTools 초기화 (jdkHelper 포함)
   const androidSdkTools = await AndroidSdkTools.create(process, config, jdkHelper);
-  console.log('AndroidSdkTools 초기화 완료!');
+  console.log('4. AndroidSdkTools 초기화 완료!');
 
-  // GradleWrapper
   const keyPassword = process.env.KEY_PASSWORD;
   const gradleWrapper = new GradleWrapper(process, androidSdkTools, targetDir);
-  console.log('Gradle 빌드 중...');
+  console.log('5. Gradle 빌드 중...');
   await gradleWrapper.bundleRelease();
-  console.log('Gradle 빌드 완료!');
+  console.log('6. Gradle 빌드 완료!');
 
-  // 서명
   const jarSigner = new JarSigner(config);
-  const unsignedAab = path.resolve(
-    targetDir,
-    'app/build/outputs/bundle/release/app-release.aab'
-  );
+  const unsignedAab = path.resolve(targetDir, 'app/build/outputs/bundle/release/app-release.aab');
   const signedAab = path.resolve(targetDir, 'app-release-signed.aab');
 
-  console.log('서명 중...');
+  console.log('7. 서명 중...');
   await jarSigner.sign(
     path.resolve(targetDir, 'signing.keystore'),
     'dvsoft',
@@ -93,7 +85,7 @@ async function main() {
     unsignedAab,
     signedAab
   );
-  console.log('서명 완료!');
+  console.log('8. 서명 완료!');
   console.log('AAB 파일:', signedAab);
 }
 
