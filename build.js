@@ -64,9 +64,9 @@ async function main() {
   const androidSdkTools = await AndroidSdkTools.create(process, config);
   console.log('AndroidSdkTools 초기화 완료!');
 
-  // GradleWrapper
+  // GradleWrapper - 올바른 순서: process, androidSdkTools, projectLocation
   const keyPassword = process.env.KEY_PASSWORD;
-  const gradleWrapper = new GradleWrapper(process, config, targetDir, androidSdkTools);
+  const gradleWrapper = new GradleWrapper(process, androidSdkTools, targetDir);
   console.log('Gradle 빌드 중...');
   await gradleWrapper.bundleRelease();
   console.log('Gradle 빌드 완료!');
