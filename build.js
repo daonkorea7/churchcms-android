@@ -9,6 +9,7 @@ async function main() {
     GradleWrapper,
     JarSigner,
     AndroidSdkTools,
+    JdkHelper,
   } = require('@bubblewrap/core');
 
   const targetDir = path.resolve('./twa-project');
@@ -60,11 +61,15 @@ async function main() {
   await generator.createTwaProject(targetDir, twaManifest, config);
   console.log('프로젝트 생성 완료!');
 
-  // AndroidSdkTools 초기화
-  const androidSdkTools = await AndroidSdkTools.create(process, config);
+  // JdkHelper 초기화
+  const jdkHelper = new JdkHelper(process, config);
+  console.log('JdkHelper 초기화 완료!');
+
+  // AndroidSdkTools 초기화 (jdkHelper 포함)
+  const androidSdkTools = await AndroidSdkTools.create(process, config, jdkHelper);
   console.log('AndroidSdkTools 초기화 완료!');
 
-  // GradleWrapper - 올바른 순서: process, androidSdkTools, projectLocation
+  // GradleWrapper
   const keyPassword = process.env.KEY_PASSWORD;
   const gradleWrapper = new GradleWrapper(process, androidSdkTools, targetDir);
   console.log('Gradle 빌드 중...');
