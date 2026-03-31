@@ -25,10 +25,9 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Bubblewrap and expect
+      - name: Install dependencies
         run: |
-          npm install -g @bubblewrap/cli
-          sudo apt-get install -y expect
+          npm install @bubblewrap/core
 
       - name: Create Bubblewrap config
         run: |
@@ -40,88 +39,26 @@ jobs:
           }
           BWEOF
 
-      - name: Create twa-manifest and build
+      - name: Setup project
+        run: |
+          cp signing.keystore signing.keystore
+          cp build.js build.js
+
+      - name: Build AAB
         env:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: |
-          mkdir -p twa-project
-          cp signing.keystore twa-project/signing.keystore
-
-          cat > twa-project/twa-manifest.json << 'TWAJSON'
-          {
-            "packageId": "kr.dvsoft.churchcms",
-            "host": "dvsoft.kr",
-            "name": "디바인교회관리",
-            "launcherName": "교회관리",
-            "display": "standalone",
-            "themeColor": "#2c3e52",
-            "navigationColor": "#2c3e52",
-            "navigationColorDark": "#2c3e52",
-            "navigationDividerColor": "#2c3e52",
-            "navigationDividerColorDark": "#2c3e52",
-            "backgroundColor": "#2c3e52",
-            "enableNotifications": false,
-            "startUrl": "/mobile/",
-            "iconUrl": "https://dvsoft.kr/mobile/icon-512.png",
-            "maskableIconUrl": "https://dvsoft.kr/mobile/icon-512.png",
-            "monochromeIconUrl": null,
-            "splashScreenFadeOutDuration": 300,
-            "signingKey": {
-              "path": "signing.keystore",
-              "alias": "dvsoft"
-            },
-            "appVersionCode": 2,
-            "appVersion": "2.0.0",
-            "shortcuts": [],
-            "generatorApp": "bubblewrap-cli",
-            "webManifestUrl": "https://dvsoft.kr/mobile/manifest.json",
-            "fallbackType": "customtabs",
-            "features": {
-              "locationDelegation": {"enabled": false},
-              "playBilling": {"enabled": false}
-            },
-            "isChromeOSOnly": false,
-            "isMetaQuest": false,
-            "orientation": "portrait",
-            "fingerprints": []
-          }
-          TWAJSON
-
-          # expect로 비밀번호 입력
-          cd twa-project
-          expect -c "
-          set timeout 180
-          spawn bubblewrap update
-          expect \"Key Store:\" { send \"$env(KEY_PASSWORD)\r\" }
-          expect \"Key:\" { send \"$env(KEY_PASSWORD)\r\" }
-          expect eof
-          "
-
-      - name: Check Result
-        run: ls -la twa-project/
-
-      - name: Build
-        env:
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: |
-          cd twa-project
-          expect -c "
-          set timeout 180
-          spawn bubblewrap build
-          expect \"regenerate\" { send \"n\r\" }
-          expect \"Key Store:\" { send \"$env(KEY_PASSWORD)\r\" }
-          expect \"Key:\" { send \"$env(KEY_PASSWORD)\r\" }
-          expect eof
-          "
+          JAVA_HOME: ${{ env.JAVA_HOME }}
+          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+        run: node build.js
 
       - name: Find output files
-        run: find twa-project -name "*.aab" -o -name "*.apk" | head -20
+        run: find . -name "*.aab" -o -name "*.apk" | head -20
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
           name: app-release-bundle
           path: |
-            twa-project/**/*.aab
-            twa-project/**/*.apk
+            **/*.aab
+            **/*.apk
           if-no-files-found: warn
