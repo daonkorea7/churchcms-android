@@ -34,8 +34,8 @@ async function main() {
     iconUrl: 'https://dvsoft.kr/mobile/icon-512.png',
     maskableIconUrl: 'https://dvsoft.kr/mobile/icon-512.png',
     splashScreenFadeOutDuration: 300,
-    appVersionCode: 2,
-    appVersion: '2.0.0',
+    appVersionCode: 3,
+    appVersion: '3.0.0',
     signingKey: {
       path: './signing.keystore',
       alias: 'dvsoft',
