@@ -25,10 +25,8 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Bubblewrap and expect
-        run: |
-          npm install -g @bubblewrap/cli
-          sudo apt-get install -y expect
+      - name: Install Bubblewrap
+        run: npm install -g @bubblewrap/cli
 
       - name: Create Bubblewrap config
         run: |
@@ -47,39 +45,28 @@ jobs:
           mkdir -p twa-project
           cp signing.keystore twa-project/signing.keystore
 
-          expect -c "
-          set timeout 180
-          spawn bubblewrap init --manifest=https://dvsoft.kr/mobile/manifest.json --directory=twa-project
-          expect \"Domain:\"
-          send \"\r\"
-          expect \"URL path:\"
-          send \"\r\"
-          expect \":\"
-          send \"\r\"
-          expect \":\"
-          send \"\r\"
-          expect \":\"
-          send \"\r\"
-          expect \":\"
-          send \"\r\"
-          expect \":\"
-          send \"kr.dvsoft.churchcms\r\"
-          expect \":\"
-          send \"2\r\"
-          expect \":\"
-          send \"2.0.0\r\"
-          expect \":\"
-          send \"twa-project/signing.keystore\r\"
-          expect \":\"
-          send \"dvsoft\r\"
-          expect \":\"
-          send \"$env(KEY_PASSWORD)\r\"
-          expect \":\"
-          send \"$env(KEY_PASSWORD)\r\"
-          expect \":\"
-          send \"n\r\"
-          expect eof
-          "
+          # 모든 답변을 한줄씩 파일로 작성
+          cat > /tmp/answers.txt << ANSWERS
+          
+          /mobile/
+          
+          
+          
+          
+          kr.dvsoft.churchcms
+          2
+          2.0.0
+          twa-project/signing.keystore
+          dvsoft
+          ${KEY_PASSWORD}
+          ${KEY_PASSWORD}
+          n
+          ANSWERS
+
+          bubblewrap init \
+            --manifest=https://dvsoft.kr/mobile/manifest.json \
+            --directory=twa-project \
+            < /tmp/answers.txt
 
       - name: Check Init Result
         run: |
@@ -91,14 +78,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           cd twa-project
-          expect -c "
-          set timeout 180
-          spawn bubblewrap build
-          expect \"regenerate\" { send \"n\r\" }
-          expect \"Key Store\" { send \"$env(KEY_PASSWORD)\r\" }
-          expect \"Key:\" { send \"$env(KEY_PASSWORD)\r\" }
-          expect eof
-          "
+          printf "n\n${KEY_PASSWORD}\n${KEY_PASSWORD}\n" | bubblewrap build
 
       - name: Find output files
         run: find twa-project -name "*.aab" -o -name "*.apk" | head -20
