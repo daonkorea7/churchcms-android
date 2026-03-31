@@ -61,7 +61,7 @@ async function main() {
   await generator.createTwaProject(targetDir, twaManifest, config);
   console.log('2. 프로젝트 생성 완료!');
 
-  // build.gradle의 splashScreenFadeOutDuration 값 확인 및 수정
+  // build.gradle splashScreenFadeOutDuration 수정
   const buildGradlePath = path.resolve(targetDir, 'app/build.gradle');
   let buildGradle = fs.readFileSync(buildGradlePath, 'utf8');
   buildGradle = buildGradle.replace(
@@ -83,14 +83,19 @@ async function main() {
   await gradleWrapper.bundleRelease();
   console.log('6. Gradle 빌드 완료!');
 
-  const jarSigner = new JarSigner(config);
+  // JarSigner - jdkHelper 전달, 올바른 API 사용
+  const jarSigner = new JarSigner(jdkHelper);
   const unsignedAab = path.resolve(targetDir, 'app/build/outputs/bundle/release/app-release.aab');
   const signedAab = path.resolve(targetDir, 'app-release-signed.aab');
 
+  const signingKeyInfo = {
+    path: path.resolve(targetDir, 'signing.keystore'),
+    alias: 'dvsoft',
+  };
+
   console.log('7. 서명 중...');
   await jarSigner.sign(
-    path.resolve(targetDir, 'signing.keystore'),
-    'dvsoft',
+    signingKeyInfo,
     keyPassword,
     keyPassword,
     unsignedAab,
