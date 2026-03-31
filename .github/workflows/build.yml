@@ -50,20 +50,34 @@ jobs:
           expect -c "
           set timeout 180
           spawn bubblewrap init --manifest=https://dvsoft.kr/mobile/manifest.json --directory=twa-project
-          expect \"Domain:\" { send \"\r\" }
-          expect \"URL path:\" { send \"/mobile/\r\" }
-          expect -re \"name.*:\" { send \"\r\" }
-          expect -re \"name.*:\" { send \"\r\" }
-          expect -re \"theme.*:\" { send \"\r\" }
-          expect -re \"background.*:\" { send \"\r\" }
-          expect -re \"Package ID.*:\" { send \"kr.dvsoft.churchcms\r\" }
-          expect -re \"version code.*:\" { send \"2\r\" }
-          expect -re \"version name.*:\" { send \"2.0.0\r\" }
-          expect -re \"signing key.*:\" { send \"twa-project/signing.keystore\r\" }
-          expect -re \"alias.*:\" { send \"dvsoft\r\" }
-          expect \"Key Store\" { send \"$env(KEY_PASSWORD)\r\" }
-          expect \"Key:\" { send \"$env(KEY_PASSWORD)\r\" }
-          expect -re \"install.*\" { send \"n\r\" }
+          expect \"Domain:\"
+          send \"\r\"
+          expect \"URL path:\"
+          send \"\r\"
+          expect \":\"
+          send \"\r\"
+          expect \":\"
+          send \"\r\"
+          expect \":\"
+          send \"\r\"
+          expect \":\"
+          send \"\r\"
+          expect \":\"
+          send \"kr.dvsoft.churchcms\r\"
+          expect \":\"
+          send \"2\r\"
+          expect \":\"
+          send \"2.0.0\r\"
+          expect \":\"
+          send \"twa-project/signing.keystore\r\"
+          expect \":\"
+          send \"dvsoft\r\"
+          expect \":\"
+          send \"$env(KEY_PASSWORD)\r\"
+          expect \":\"
+          send \"$env(KEY_PASSWORD)\r\"
+          expect \":\"
+          send \"n\r\"
           expect eof
           "
 
